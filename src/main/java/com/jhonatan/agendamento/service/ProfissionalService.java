@@ -1,12 +1,12 @@
 package com.jhonatan.agendamento.service;
 
 import com.jhonatan.agendamento.dto.request.ProfissionalRequest;
+import com.jhonatan.agendamento.dto.response.DisponibilidadeResponse;
 import com.jhonatan.agendamento.dto.response.EspecialidadeResponse;
 import com.jhonatan.agendamento.dto.response.ProfissionalResponse;
 import com.jhonatan.agendamento.exception.ConflitoException;
 import com.jhonatan.agendamento.exception.RecursoNaoEncontradoException;
 import com.jhonatan.agendamento.exception.RegraDeNegocioException;
-import com.jhonatan.agendamento.model.Agendamento;
 import com.jhonatan.agendamento.model.Especialidade;
 import com.jhonatan.agendamento.model.Profissional;
 import com.jhonatan.agendamento.model.StatusAgendamento;
@@ -98,18 +98,26 @@ public class ProfissionalService {
         profissionalRepository.save(profissional);
     }
 
-    public List<Agendamento> consultarDisponibilidade(Long profissionalId, LocalDate data) {
+    public List<DisponibilidadeResponse> consultarDisponibilidade(Long profissionalId, LocalDate data) {
         buscarProfissionalAtivo(profissionalId);
 
         LocalDateTime inicioDia = data.atStartOfDay();
         LocalDateTime fimDia = data.plusDays(1).atStartOfDay().minusNanos(1);
 
         return agendamentoRepository.findByProfissionalIdAndStatusAndDataHoraInicioBetween(
-                profissionalId,
-                StatusAgendamento.AGENDADO,
-                inicioDia,
-                fimDia
-        );
+                        profissionalId,
+                        StatusAgendamento.AGENDADO,
+                        inicioDia,
+                        fimDia
+                )
+                .stream()
+                .map(agendamento -> new DisponibilidadeResponse(
+                        agendamento.getId(),
+                        agendamento.getDataHoraInicio(),
+                        agendamento.getDataHoraFim(),
+                        agendamento.getStatus().name()
+                ))
+                .toList();
     }
 
     private Profissional buscarProfissionalAtivo(Long id) {

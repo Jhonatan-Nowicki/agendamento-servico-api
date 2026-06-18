@@ -1,8 +1,8 @@
 package com.jhonatan.agendamento.controller;
 
 import com.jhonatan.agendamento.dto.request.ProfissionalRequest;
+import com.jhonatan.agendamento.dto.response.DisponibilidadeResponse;
 import com.jhonatan.agendamento.dto.response.ProfissionalResponse;
-import com.jhonatan.agendamento.model.Agendamento;
 import com.jhonatan.agendamento.service.ProfissionalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -91,7 +91,7 @@ public class ProfissionalController {
             @ApiResponse(responseCode = "200", description = "Horários ocupados listados com sucesso"),
             @ApiResponse(responseCode = "404", description = "Profissional não encontrado")
     })
-    public ResponseEntity<List<Agendamento>> consultarDisponibilidade(
+    public ResponseEntity<List<DisponibilidadeResponse>> consultarDisponibilidade(
             @PathVariable Long id,
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

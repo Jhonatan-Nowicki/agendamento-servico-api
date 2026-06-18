@@ -1,6 +1,7 @@
 package com.jhonatan.agendamento.service;
 
 import com.jhonatan.agendamento.dto.request.ProfissionalRequest;
+import com.jhonatan.agendamento.dto.response.DisponibilidadeResponse;
 import com.jhonatan.agendamento.dto.response.ProfissionalResponse;
 import com.jhonatan.agendamento.exception.ConflitoException;
 import com.jhonatan.agendamento.exception.RecursoNaoEncontradoException;
@@ -193,11 +194,15 @@ class ProfissionalServiceTest {
     @Test
     void deveConsultarDisponibilidadeComSucesso() {
         LocalDate data = LocalDate.now().plusDays(1);
+        LocalDateTime inicio = data.atTime(10, 0);
+        LocalDateTime fim = inicio.plusMinutes(30);
 
         Agendamento agendamento = new Agendamento();
         agendamento.setId(1L);
         agendamento.setProfissional(profissional);
         agendamento.setStatus(StatusAgendamento.AGENDADO);
+        agendamento.setDataHoraInicio(inicio);
+        agendamento.setDataHoraFim(fim);
 
         when(profissionalRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(profissional));
         when(agendamentoRepository.findByProfissionalIdAndStatusAndDataHoraInicioBetween(
@@ -207,9 +212,12 @@ class ProfissionalServiceTest {
                 any(LocalDateTime.class)
         )).thenReturn(List.of(agendamento));
 
-        List<Agendamento> resultado = profissionalService.consultarDisponibilidade(1L, data);
+        List<DisponibilidadeResponse> resultado = profissionalService.consultarDisponibilidade(1L, data);
 
         assertEquals(1, resultado.size());
-        assertEquals(1L, resultado.get(0).getId());
+        assertEquals(1L, resultado.get(0).agendamentoId());
+        assertEquals(inicio, resultado.get(0).dataHoraInicio());
+        assertEquals(fim, resultado.get(0).dataHoraFim());
+        assertEquals("AGENDADO", resultado.get(0).status());
     }
 }
