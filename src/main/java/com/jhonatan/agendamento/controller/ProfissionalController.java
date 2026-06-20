@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,14 +31,14 @@ public class ProfissionalController {
     @PostMapping
     @Operation(summary = "Criar profissional")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Profissional criado com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Profissional criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "404", description = "Especialidade não encontrada ou inativa"),
             @ApiResponse(responseCode = "409", description = "Email já cadastrado")
     })
     public ResponseEntity<ProfissionalResponse> criar(
             @Valid @RequestBody ProfissionalRequest request) {
-        return ResponseEntity.ok(service.criar(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request));
     }
 
     @GetMapping

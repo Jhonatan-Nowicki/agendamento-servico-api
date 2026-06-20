@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,12 +28,15 @@ public class ServicoController {
     @PostMapping
     @Operation(summary = "Criar serviço")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Serviço criado com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Serviço criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "404", description = "Especialidade não encontrada")
     })
-    public ServicoResponse criar(@Valid @RequestBody ServicoRequest request) {
-        return servicoService.criar(request);
+    public ResponseEntity<ServicoResponse> criar(
+            @Valid @RequestBody ServicoRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(servicoService.criar(request));
     }
 
     @GetMapping
@@ -39,8 +44,8 @@ public class ServicoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Serviços listados com sucesso")
     })
-    public List<ServicoResponse> listar() {
-        return servicoService.listar();
+    public ResponseEntity<List<ServicoResponse>> listar() {
+        return ResponseEntity.ok(servicoService.listar());
     }
 
     @GetMapping("/{id}")
@@ -49,8 +54,8 @@ public class ServicoController {
             @ApiResponse(responseCode = "200", description = "Serviço encontrado"),
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado")
     })
-    public ServicoResponse buscarPorId(@PathVariable Long id) {
-        return servicoService.buscarPorId(id);
+    public ResponseEntity<ServicoResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(servicoService.buscarPorId(id));
     }
 
     @GetMapping("/especialidade/{especialidadeId}")
@@ -58,8 +63,12 @@ public class ServicoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Serviços listados com sucesso")
     })
-    public List<ServicoResponse> listarPorEspecialidade(@PathVariable Long especialidadeId) {
-        return servicoService.listarPorEspecialidade(especialidadeId);
+    public ResponseEntity<List<ServicoResponse>> listarPorEspecialidade(
+            @PathVariable Long especialidadeId) {
+
+        return ResponseEntity.ok(
+                servicoService.listarPorEspecialidade(especialidadeId)
+        );
     }
 
     @PutMapping("/{id}")
@@ -69,11 +78,13 @@ public class ServicoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "404", description = "Serviço ou especialidade não encontrada")
     })
-    public ServicoResponse atualizar(
+    public ResponseEntity<ServicoResponse> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody ServicoRequest request) {
 
-        return servicoService.atualizar(id, request);
+        return ResponseEntity.ok(
+                servicoService.atualizar(id, request)
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -82,7 +93,8 @@ public class ServicoController {
             @ApiResponse(responseCode = "204", description = "Serviço desativado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado")
     })
-    public void desativar(@PathVariable Long id) {
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
         servicoService.desativar(id);
+        return ResponseEntity.noContent().build();
     }
 }

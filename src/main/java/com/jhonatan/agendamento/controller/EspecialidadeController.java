@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -27,13 +28,13 @@ public class EspecialidadeController {
     @PostMapping
     @Operation(summary = "Criar especialidade")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Especialidade criada com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Especialidade criada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "409", description = "Especialidade já cadastrada")
     })
     public ResponseEntity<EspecialidadeResponse> criar(
             @Valid @RequestBody EspecialidadeRequest request) {
-        return ResponseEntity.ok(service.criar(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request));
     }
 
     @GetMapping

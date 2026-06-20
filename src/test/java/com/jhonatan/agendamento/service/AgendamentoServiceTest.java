@@ -116,6 +116,24 @@ class AgendamentoServiceTest {
         assertEquals(request.dataHoraInicio().plusMinutes(30), response.dataHoraFim());
         verify(agendamentoRepository).save(any(Agendamento.class));
     }
+    @Test
+    void deveBloquearCriacaoQuandoDataHoraInicioEstiverNoPassado() {
+        AgendamentoRequest requestPassado = new AgendamentoRequest(
+                1L,
+                1L,
+                1L,
+                LocalDateTime.now().minusHours(1),
+                "Agendamento no passado"
+        );
+
+        when(clienteRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(cliente));
+        when(profissionalRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(profissional));
+        when(servicoRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(servico));
+
+        assertThrows(RegraDeNegocioException.class, () -> agendamentoService.criar(requestPassado));
+
+        verify(agendamentoRepository, never()).save(any(Agendamento.class));
+    }
 
     @Test
     void deveBloquearCriacaoQuandoExisteConflitoDeHorario() {
@@ -222,6 +240,7 @@ class AgendamentoServiceTest {
 
         verify(agendamentoRepository, never()).save(any(Agendamento.class));
     }
+
 
     private Agendamento criarAgendamentoSalvo(StatusAgendamento status, LocalDateTime inicio) {
         Agendamento agendamento = new Agendamento();

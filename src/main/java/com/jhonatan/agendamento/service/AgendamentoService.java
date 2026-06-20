@@ -41,11 +41,17 @@ public class AgendamentoService {
         Servico servico = servicoRepository.findByIdAndAtivoTrue(request.servicoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado ou inativo"));
 
+
         if (!profissionalPossuiEspecialidade(profissional, servico.getEspecialidade().getId())) {
             throw new RegraDeNegocioException("Profissional não possui a especialidade do serviço");
         }
 
         LocalDateTime inicio = request.dataHoraInicio();
+
+        if (!inicio.isAfter(LocalDateTime.now())) {
+            throw new RegraDeNegocioException("Não é permitido agendar no passado");
+        }
+
         LocalDateTime fim = inicio.plusMinutes(servico.getDuracaoMinutos());
 
         List<Agendamento> conflitos =
@@ -55,7 +61,6 @@ public class AgendamentoService {
                         fim,
                         inicio
                 );
-
         if (!conflitos.isEmpty()) {
             throw new ConflitoException("Profissional já possui agendamento neste horário");
         }

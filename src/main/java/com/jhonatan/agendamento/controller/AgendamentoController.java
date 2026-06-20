@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -27,13 +28,14 @@ public class AgendamentoController {
     @PostMapping
     @Operation(summary = "Criar agendamento")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Agendamento criado com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
             @ApiResponse(responseCode = "404", description = "Cliente, profissional ou serviço não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Conflito de horário")
+            @ApiResponse(responseCode = "409", description = "Conflito de horário"),
+            @ApiResponse(responseCode = "422", description = "Regra de negócio violada")
     })
     public ResponseEntity<AgendamentoResponse> criar(@Valid @RequestBody AgendamentoRequest request) {
-        return ResponseEntity.ok(service.criar(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request));
     }
 
     @GetMapping
@@ -78,7 +80,7 @@ public class AgendamentoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento cancelado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Regra de negócio violada")
+            @ApiResponse(responseCode = "422", description = "Regra de negócio violada")
     })
     public ResponseEntity<AgendamentoResponse> cancelar(@PathVariable Long id) {
         return ResponseEntity.ok(service.cancelar(id));
@@ -89,7 +91,7 @@ public class AgendamentoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Agendamento concluído com sucesso"),
             @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
-            @ApiResponse(responseCode = "409", description = "Regra de negócio violada")
+            @ApiResponse(responseCode = "422", description = "Regra de negócio violada")
     })
     public ResponseEntity<AgendamentoResponse> concluir(@PathVariable Long id) {
         return ResponseEntity.ok(service.concluir(id));
