@@ -63,27 +63,21 @@ Cliente HTTP
 ## Responsabilidades
 
 ### Controller
-
 Responsável por receber requisições HTTP e retornar respostas da API.
 
 ### DTO Request
-
 Responsável pela entrada de dados e validações iniciais.
 
 ### Service
-
 Responsável pelas regras de negócio da aplicação.
 
 ### Repository
-
 Responsável pelo acesso aos dados utilizando Spring Data JPA.
 
 ### Entity
-
 Representa os dados persistidos no banco de dados.
 
 ### DTO Response
-
 Responsável por retornar apenas as informações necessárias para o cliente, evitando exposição direta das entidades.
 
 ---
@@ -108,32 +102,25 @@ Especialidade
 ## Relacionamentos
 
 ### Cliente
-
 Representa o usuário que agenda um serviço.
 
 ### Profissional
-
 Representa o prestador responsável pela execução do serviço.
 
 ### Especialidade
-
 Define uma área de atuação do profissional.
 
 Exemplos:
-
 * Corte Masculino
 * Barba
 * Manicure
 * Pedicure
 
 ### Serviço
-
 Representa um serviço oferecido e está vinculado a uma especialidade.
 
 ### Agendamento
-
 Relaciona:
-
 * Cliente
 * Profissional
 * Serviço
@@ -143,81 +130,85 @@ Relaciona:
 
 ---
 
-# Funcionalidades
+# Endpoints da API
 
-## Especialidades
+## Clientes — `/api/clientes`
 
-* Criar especialidade
-* Listar especialidades ativas
-* Buscar especialidade por ID
-* Atualizar especialidade
-* Desativar especialidade
+| Método | Endpoint              | Descrição                      |
+|--------|------------------------|---------------------------------|
+| POST   | /api/clientes          | Criar novo cliente              |
+| GET    | /api/clientes          | Listar todos os clientes ativos |
+| GET    | /api/clientes/{id}     | Buscar cliente por ID           |
+| PUT    | /api/clientes/{id}     | Atualizar cliente               |
+| DELETE | /api/clientes/{id}     | Desativar cliente (soft delete) |
 
-## Clientes
+## Especialidades — `/api/especialidades`
 
-* Criar cliente
-* Listar clientes ativos
-* Buscar cliente por ID
-* Atualizar cliente
-* Desativar cliente
+| Método | Endpoint                  | Descrição                              |
+|--------|----------------------------|------------------------------------------|
+| POST   | /api/especialidades        | Criar nova especialidade                |
+| GET    | /api/especialidades        | Listar todas as especialidades ativas   |
+| GET    | /api/especialidades/{id}   | Buscar especialidade por ID             |
+| PUT    | /api/especialidades/{id}   | Atualizar especialidade                 |
+| DELETE | /api/especialidades/{id}   | Desativar especialidade (soft delete)   |
 
-## Profissionais
+## Profissionais — `/api/profissionais`
 
-* Criar profissional
-* Listar profissionais ativos
-* Buscar profissional por ID
-* Atualizar profissional
-* Desativar profissional
-* Consultar disponibilidade por data
+| Método | Endpoint                              | Descrição                                  |
+|--------|-----------------------------------------|-----------------------------------------------|
+| POST   | /api/profissionais                      | Criar novo profissional                       |
+| GET    | /api/profissionais                      | Listar todos os profissionais ativos          |
+| GET    | /api/profissionais/{id}                 | Buscar profissional por ID                    |
+| GET    | /api/profissionais/{id}/disponibilidade | Consultar horários já ocupados (param: `data`)|
+| PUT    | /api/profissionais/{id}                 | Atualizar profissional                        |
+| DELETE | /api/profissionais/{id}                 | Desativar profissional (soft delete)          |
 
-## Serviços
+## Serviços — `/api/servicos`
 
-* Criar serviço
-* Listar serviços ativos
-* Buscar serviço por ID
-* Atualizar serviço
-* Desativar serviço
-* Listar serviços por especialidade
+| Método | Endpoint                              | Descrição                          |
+|--------|-----------------------------------------|---------------------------------------|
+| POST   | /api/servicos                           | Criar novo serviço                    |
+| GET    | /api/servicos                           | Listar todos os serviços ativos       |
+| GET    | /api/servicos/{id}                      | Buscar serviço por ID                 |
+| GET    | /api/servicos/especialidade/{id}        | Listar serviços por especialidade     |
+| PUT    | /api/servicos/{id}                      | Atualizar serviço                     |
+| DELETE | /api/servicos/{id}                      | Desativar serviço (soft delete)       |
 
-## Agendamentos
+## Agendamentos — `/api/agendamentos`
 
-* Criar agendamento
-* Listar agendamentos
-* Buscar agendamento por ID
-* Listar por cliente
-* Listar por profissional
-* Cancelar agendamento
-* Concluir agendamento
+| Método | Endpoint                                  | Descrição                              |
+|--------|---------------------------------------------|--------------------------------------------|
+| POST   | /api/agendamentos                           | Criar novo agendamento                     |
+| GET    | /api/agendamentos                           | Listar todos os agendamentos               |
+| GET    | /api/agendamentos/{id}                      | Buscar agendamento por ID                  |
+| GET    | /api/agendamentos/cliente/{id}              | Listar agendamentos por cliente            |
+| GET    | /api/agendamentos/profissional/{id}         | Listar agendamentos por profissional       |
+| PATCH  | /api/agendamentos/{id}/cancelar             | Cancelar agendamento                       |
+| PATCH  | /api/agendamentos/{id}/concluir             | Marcar agendamento como concluído          |
 
 ---
 
 # Regras de Negócio
 
 ## Clientes
-
 * Não permite cadastro de clientes com e-mail duplicado.
 
 ## Profissionais
-
 * Não permite cadastro de profissionais com e-mail duplicado.
-* Todas as especialidades devem existir e estar ativas.
+* Todas as especialidades informadas devem existir e estar ativas.
+* Não é possível desativar um profissional que possua agendamentos futuros com status `AGENDADO`.
 
 ## Especialidades
-
 * Não permite nomes duplicados.
 
 ## Serviços
-
 * Devem estar vinculados a uma especialidade válida e ativa.
 
 ## Agendamentos
-
-* Cliente deve existir e estar ativo.
-* Profissional deve existir e estar ativo.
-* Serviço deve existir e estar ativo.
+* Cliente, profissional e serviço informados devem existir e estar ativos.
 * O profissional deve possuir a especialidade necessária para executar o serviço.
 * Não é permitido criar agendamentos em datas passadas.
-* Não é permitido conflito de horários para o mesmo profissional.
+* Não é permitido conflito de horários para o mesmo profissional — `dataHoraFim` é calculada automaticamente como `dataHoraInicio + duracaoMinutos` do serviço.
 
 ### Exemplo de conflito de horário
 
@@ -229,40 +220,37 @@ Tentativa de novo agendamento:
 09:15 às 09:45
 
 Resultado:
-ConflitoException
+409 Conflict — ConflitoException
 ```
 
 ## Cancelamentos
-
-* Não é permitido cancelar agendamentos concluídos.
-* O cancelamento exige antecedência mínima de 2 horas.
+* Não é permitido cancelar agendamentos com status `CONCLUIDO`.
+* O cancelamento exige antecedência mínima de 2 horas em relação ao horário de início.
 
 ## Conclusão
-
-* Não é permitido concluir agendamentos cancelados.
-
-## Desativação de Profissionais
-
-* Não é permitido desativar profissionais que possuam agendamentos futuros.
+* Não é permitido concluir agendamentos com status `CANCELADO`.
 
 ---
 
 # Tratamento de Exceções
 
-A aplicação utiliza tratamento centralizado de exceções através de:
+A aplicação utiliza tratamento centralizado de exceções através do `GlobalExceptionHandler`, que padroniza todas as respostas de erro no seguinte formato:
 
-```text
-GlobalExceptionHandler
+```json
+{
+  "status": 404,
+  "mensagem": "Cliente não encontrado",
+  "dataHora": "2026-06-20T14:32:10"
+}
 ```
 
-Exceções tratadas:
-
-* RecursoNaoEncontradoException
-* ConflitoException
-* RegraDeNegocioException
-* Erros de validação
-
-Retornando respostas padronizadas para o cliente.
+| Exceção                          | Status HTTP | Quando ocorre                                                        |
+|-----------------------------------|-------------|------------------------------------------------------------------------|
+| `MethodArgumentNotValidException` | 400         | Dados inválidos (Bean Validation nos DTOs de Request)                  |
+| `RecursoNaoEncontradoException`   | 404         | Recurso não encontrado (ou inativo)                                    |
+| `ConflitoException`               | 409         | E-mail/nome duplicado, conflito de horário                             |
+| `RegraDeNegocioException`         | 422         | Violação de regra de negócio (ex: cancelamento fora do prazo)          |
+| `Exception` (genérico)            | 500         | Erro interno não tratado                                                |
 
 ---
 
@@ -274,7 +262,7 @@ Banco utilizado:
 PostgreSQL
 ```
 
-Configuração padrão:
+Configuração padrão (pode ser sobrescrita pelas variáveis de ambiente `DB_USERNAME` e `DB_PASSWORD`):
 
 ```text
 Database: agendamento_db
@@ -289,12 +277,18 @@ Senha: postgres
 # Executando com Docker
 
 ```bash
-  docker run --name postgres-agendamento \
--e POSTGRES_DB=agendamento_db \
--e POSTGRES_USER=postgres \
--e POSTGRES_PASSWORD=postgres \
--p 5432:5432 \
--d postgres
+  docker compose up -d
+```
+
+Ou, alternativamente, subindo apenas o container do banco manualmente:
+
+```bash
+docker run --name postgres-agendamento \
+  -e POSTGRES_DB=agendamento_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  -d postgres
 ```
 
 ---
@@ -313,73 +307,311 @@ Senha: postgres
   cd agendamento-servico-api
 ```
 
+## Subir o banco de dados
+
+```bash
+  docker compose up -d
+```
+
 ## Executar a aplicação
 
 ```bash
   ./mvnw spring-boot:run
 ```
 
-Ou executar diretamente pela IDE.
+Ou executar diretamente pela IDE, a partir da classe `AgendamentoServicosApiApplication`.
+
+A aplicação sobe por padrão na porta `8080`.
 
 ---
 
-# Documentação da API
+# Documentação da API (Swagger)
 
-Swagger disponível em:
+Com a aplicação rodando, a documentação interativa está disponível em:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-A documentação contém todos os endpoints da aplicação, parâmetros, DTOs, respostas e códigos HTTP possíveis.
+A documentação contém todos os endpoints da aplicação, parâmetros, DTOs, respostas e códigos HTTP possíveis, através das anotações `@OpenAPIDefinition`, `@Tag`, `@Operation` e `@ApiResponse`.
+
+---
+
+# Exemplos de Uso da API
+
+## Especialidades
+
+### Criar Especialidade
+
+`POST /api/especialidades` → `201 Created`
+
+**Request**
+```json
+{
+  "nome": "Corte Masculino",
+  "descricao": "Serviços de corte de cabelo masculino"
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "nome": "Corte Masculino",
+  "descricao": "Serviços de corte de cabelo masculino",
+  "ativo": true
+}
+```
+
+---
+
+## Clientes
+
+### Criar Cliente
+
+`POST /api/clientes` → `201 Created`
+
+**Request**
+```json
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "telefone": "41999999999"
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "telefone": "41999999999",
+  "ativo": true
+}
+```
+
+---
+
+## Profissionais
+
+### Criar Profissional
+
+`POST /api/profissionais` → `201 Created`
+
+**Request**
+```json
+{
+  "nome": "Carlos Oliveira",
+  "email": "carlos@email.com",
+  "especialidadeIds": [1]
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "nome": "Carlos Oliveira",
+  "email": "carlos@email.com",
+  "ativo": true,
+  "especialidades": [
+    {
+      "id": 1,
+      "nome": "Corte Masculino",
+      "descricao": "Serviços de corte de cabelo masculino",
+      "ativo": true
+    }
+  ]
+}
+```
+
+### Consultar Disponibilidade
+
+`GET /api/profissionais/1/disponibilidade?data=2026-06-25` → `200 OK`
+
+Retorna os horários **já ocupados** do profissional na data informada:
+
+**Response**
+```json
+[
+  {
+    "agendamentoId": 1,
+    "dataHoraInicio": "2026-06-25T14:00:00",
+    "dataHoraFim": "2026-06-25T14:30:00",
+    "status": "AGENDADO"
+  }
+]
+```
+
+---
+
+## Serviços
+
+### Criar Serviço
+
+`POST /api/servicos` → `201 Created`
+
+**Request**
+```json
+{
+  "nome": "Corte Tradicional",
+  "descricao": "Corte masculino tradicional",
+  "duracaoMinutos": 30,
+  "preco": 35.00,
+  "especialidadeId": 1
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "nome": "Corte Tradicional",
+  "descricao": "Corte masculino tradicional",
+  "duracaoMinutos": 30,
+  "preco": 35.00,
+  "ativo": true,
+  "especialidade": {
+    "id": 1,
+    "nome": "Corte Masculino",
+    "descricao": "Serviços de corte de cabelo masculino",
+    "ativo": true
+  }
+}
+```
+
+---
+
+## Agendamentos
+
+### Criar Agendamento
+
+`POST /api/agendamentos` → `201 Created`
+
+**Request**
+```json
+{
+  "clienteId": 1,
+  "profissionalId": 1,
+  "servicoId": 1,
+  "dataHoraInicio": "2026-06-25T14:00:00",
+  "observacao": "Primeiro atendimento"
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "cliente": {
+    "id": 1,
+    "nome": "João Silva",
+    "email": "joao@email.com",
+    "telefone": "41999999999",
+    "ativo": true
+  },
+  "profissional": {
+    "id": 1,
+    "nome": "Carlos Oliveira",
+    "email": "carlos@email.com",
+    "ativo": true,
+    "especialidades": [
+      {
+        "id": 1,
+        "nome": "Corte Masculino",
+        "descricao": "Serviços de corte de cabelo masculino",
+        "ativo": true
+      }
+    ]
+  },
+  "servico": {
+    "id": 1,
+    "nome": "Corte Tradicional",
+    "descricao": "Corte masculino tradicional",
+    "duracaoMinutos": 30,
+    "preco": 35.00,
+    "ativo": true,
+    "especialidade": {
+      "id": 1,
+      "nome": "Corte Masculino",
+      "descricao": "Serviços de corte de cabelo masculino",
+      "ativo": true
+    }
+  },
+  "dataHoraInicio": "2026-06-25T14:00:00",
+  "dataHoraFim": "2026-06-25T14:30:00",
+  "status": "AGENDADO",
+  "observacao": "Primeiro atendimento"
+}
+```
+
+### Cancelar Agendamento
+
+`PATCH /api/agendamentos/1/cancelar` → `200 OK`
+
+Sem corpo de requisição. Retorna o agendamento atualizado, no mesmo formato do exemplo acima, com `"status": "CANCELADO"`.
+
+Caso o cancelamento seja solicitado com menos de 2 horas de antecedência, ou o agendamento já esteja `CONCLUIDO`, a API retorna `422 Unprocessable Entity`:
+
+```json
+{
+  "status": 422,
+  "mensagem": "Cancelamento permitido apenas com antecedência mínima de 2 horas",
+  "dataHora": "2026-06-25T13:00:00"
+}
+```
+
+### Concluir Agendamento
+
+`PATCH /api/agendamentos/1/concluir` → `200 OK`
+
+Sem corpo de requisição. Retorna o agendamento atualizado, no mesmo formato do exemplo de criação, com `"status": "CONCLUIDO"`.
 
 ---
 
 # Testes Unitários
 
-O projeto possui testes unitários implementados utilizando:
-
-* JUnit 5
-* Mockito
+O projeto possui testes unitários implementados utilizando JUnit 5 e Mockito, cobrindo todas as classes de service.
 
 Classes cobertas:
-
-* AgendamentoServiceTest
-* ClienteServiceTest
-* EspecialidadeServiceTest
-* ProfissionalServiceTest
-* ServicoServiceTest
+* `AgendamentoServiceTest` — inclui criação, conflito de horário, agendamento no passado, profissional sem especialidade do serviço, cancelamento fora do prazo, cancelamento de agendamento concluído e conclusão de agendamento cancelado
+* `ClienteServiceTest`
+* `EspecialidadeServiceTest`
+* `ProfissionalServiceTest` — inclui desativação com e sem agendamentos futuros, consulta de disponibilidade
+* `ServicoServiceTest`
 
 Execução:
 
 ```bash
   ./mvnw test
 ```
-
-Resultado atual:
+Resultado obtido:
 
 ```text
 Tests run: 36
 Failures: 0
 Errors: 0
+Skipped: 0
+
 BUILD SUCCESS
 ```
-
 ---
 
 # Estrutura do Projeto
 
 ```text
-src
- ├── controller
- ├── dto
- │   ├── request
- │   └── response
- ├── exception
- ├── model
- ├── repository
- ├── service
- └── config
+src/main/java/com/jhonatan/agendamento/
+ ├── controller/
+ ├── dto/
+ │   ├── request/
+ │   └── response/
+ ├── exception/
+ ├── model/
+ ├── repository/
+ ├── service/
+ ├── config/
+ └── AgendamentoServicosApiApplication.java
 ```
 
 ---
@@ -395,8 +627,12 @@ feat: implementa gerenciamento de profissionais
 feat: implementa gerenciamento de servicos
 feat: implementa sistema de agendamentos e regras de negocio
 test: adiciona testes unitarios dos services
+test: amplia cobertura de testes unitarios
 docs: aprimora documentacao swagger dos endpoints
+docs: adiciona exemplos de uso da API
 refactor: usa dto na consulta de disponibilidade
+refactor: padroniza codigos HTTP REST
+docs: reescreve README com exemplos completos e validados
 ```
 
 ---
@@ -405,5 +641,4 @@ refactor: usa dto na consulta de disponibilidade
 
 Jhonatan Nowicki
 
-GitHub:
-https://github.com/Jhonatan-Nowicki
+GitHub: https://github.com/Jhonatan-Nowicki
